@@ -17,7 +17,7 @@ pipeline {
             }
         }
         
-        stage('Build') {
+        stage('Build WAR FILE') {
             steps {
                 sh 'mvn clean package'
             }
