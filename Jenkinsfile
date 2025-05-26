@@ -54,7 +54,7 @@ pipeline {
             }
         }
     }
-	post {
+    post {
     always {
         script {
             def buildStatus = currentBuild.currentResult
