@@ -6,3 +6,4 @@ EXPOSE 8080
 
 # Copy the WAR file from the target directory of your Maven project to the Tomcat webapps directory
 COPY target/maven-cloudaseem-app.war /usr/local/tomcat/webapps/
+# COPY target/*.war /usr/local/tomcat/webapps/
