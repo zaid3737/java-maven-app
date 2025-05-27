@@ -4,8 +4,7 @@
 2) Git Hub - SCM
 3) Jenkins - CICD TOOL
 4) Docker _ container
-5) Nginx -  Webserver
-6) SSL - cerbot
+
 
 # Step-1 : Jenkins Server Setup in Linux VM #
 
@@ -108,12 +107,6 @@ sudo docker version
 
 URL : http://public-ip:port/
 	
-# We are done with our Setup #
 
-# Step - 7 : Nginx webserver #
-
-# Step - 8 : Domain #
-
-# Step - 9 : SSL certificate #
 	
 # Step - 10 : After your practise, delete resources we have used in AWS Cloud to avoid billing ##
