@@ -4,55 +4,49 @@ pipeline {
     tools {
         maven "Maven3"
     }
-       
     stages {
-	    stage('clean workspace'){
-            steps{
+        stage('Clean workspace') {
+            steps {
                 cleanWs()
             }
         }
-        stage('Git Checkout') {
+        stage('Git clone') {
             steps {
                 git branch: 'main', url: 'https://github.com/Aseemakram19/java-maven-app.git'
             }
         }
-        
-        stage('Build WAR FILE') {
+        stage('maven war file build') {
             steps {
-                sh 'mvn clean package'
+               sh 'mvn clean package'
             }
         }
-		stage("Docker Build & Push Image to DockerHub"){
-            steps{
+        stage('Docker images/conatiner remove') {
+            steps {
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t javamavenapp ."
-                       sh "docker tag javamavenapp aseemakram19/javamavenapp:latest "
-                       sh "docker push aseemakram19/javamavenapp:latest "
-                    }
+                        sh '''docker stop javamavenapp_container
+                        docker rm javamavenapp_container
+                        docker rmi javamavenapp aseemakram19/javamavenapp:latest'''
+                }  
+            }
+        }
+        stage('Docker images - Push to dockerhub') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker', toolname: 'docker'){
+                
+                        sh '''docker build -t javamavenapp .
+                        docker tag javamavenapp aseemakram19/javamavenapp:latest
+                        docker push  aseemakram19/javamavenapp:latest'''
+                      } 
                 }
             }
-        }           
-        stage('Check Port available & delete container') {
+        }
+        stage('docker container of app') {
             steps {
-                script {
-                    def portStatus = sh(script: 'netstat -tuln | grep ":9000"', returnStatus: true)
-                    if (portStatus == 0) {
-                        echo "Port 9000 is in use, stopping and removing the existing container"
-                        sh 'docker stop javamavenapp_container'
-                        sh 'docker rm javamavenapp_container'
-                    } else {
-                        echo "Port 9000 is available"
-                    }
-                }
+               sh 'docker run -d -p 9000:8080 --name javamavenapp_container -t aseemakram19/javamavenapp:latest'
             }
         }
         
-        stage('Run Docker Container on 9000 port number') {
-            steps {
-                sh 'docker run -d -p 9000:8080 --name javamavenapp_container -t aseemakram19/javamavenapp:latest'
-            }
-        }
     }
     post {
     always {
@@ -63,7 +57,7 @@ pipeline {
             emailext (
                 subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
-                    <p>This is a Jenkins amazon-prime-video CICD pipeline status.</p>
+                    <p>This is a Jenkins maven CICD pipeline status.</p>
                     <p>Project: ${env.JOB_NAME}</p>
                     <p>Build Number: ${env.BUILD_NUMBER}</p>
                     <p>Build Status: ${buildStatus}</p>
@@ -73,7 +67,8 @@ pipeline {
                 to: 'mohdaseemakram19@gmail.com',
                 from: 'mohdaseemakram19@gmail.com',
                 replyTo: 'mohdaseemakram19@gmail.com',
-                mimeType: 'text/html'                
+                mimeType: 'text/html',
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
             )
            }
        }
